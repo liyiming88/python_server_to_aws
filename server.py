@@ -1,11 +1,13 @@
 import flask
+import logging
 from flask import jsonify, request
 
 app = flask.Flask(__name__)
+logging.basicConfig(filename='app.log', level=logging.INFO)
 
 @app.route('/', methods=['GET'])
 def hello():
-    response = [{"message": "Hello, World!"}]
+    response = [{"message": "Hello, World ma!"}]
     return jsonify(response)
 
 @app.route('/postdata', methods=['POST'])
@@ -24,11 +26,13 @@ def post_data():
         "content": content,
         "id": id
     }
-    print("Received data:")
-    print("Sender:", sender)
-    print("Subject:", subject)
-    print("Content:", content)
-    print("ID:", id)
+
+    logger = logging.getLogger('postdata')
+    logger.info("Received data:")
+    logger.info("Sender: %s", sender)
+    logger.info("Subject: %s", subject)
+    logger.info("Content: %s", content)
+    logger.info("ID: %s", id)
 
     return jsonify(response)
 
