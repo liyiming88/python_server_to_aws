@@ -3,6 +3,7 @@ import logging
 from flask import jsonify, request
 
 app = flask.Flask(__name__)
+app.config['DEBUG'] = True
 logging.basicConfig(filename='app.log', level=logging.INFO)
 
 @app.route('/', methods=['GET'])
