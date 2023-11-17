@@ -3,19 +3,18 @@ from flask import jsonify
 
 app = flask.Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def hello():
-    if flask.request.method == 'POST':
-        # 处理POST请求
-        data = flask.request.json
-        # 在这里对数据进行处理
-        response = {"message": " Post, Hello, World!"}
+    response = [{"message": "Hello, World!"}]
+    return jsonify(response)
 
-        return jsonify(response)
-    else:
-        # 处理GET请求
-        response = [{"message": "Get, Hello, World!"}]
-        return jsonify(response)
+@app.route('/postdata', methods=['POST'])
+def post_data():
+    data = flask.request.json
+    # 在这里对接收到的数据进行处理
+    response = {"message": "Data received successfully"}
+
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
