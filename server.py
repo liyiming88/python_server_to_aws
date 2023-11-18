@@ -27,6 +27,7 @@ def create_response(new_data=False):
             'subject': data.get('subject'),
             'content': data.get('content'),
             'id': data.get('id'),
+            'sender_email_address': data.get('sender_email_address'),
         })
     return response
 
