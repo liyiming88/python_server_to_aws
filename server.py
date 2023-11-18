@@ -28,6 +28,7 @@ def create_response(new_data=False):
             'content': data.get('content'),
             'id': data.get('id'),
             'sender_email_address': data.get('sender_email_address'),
+            'thread_id': data.get('thread_id'),
         })
     return response
 
