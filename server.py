@@ -11,15 +11,7 @@ previous_data = {'id': 'previous_default'}
 
 # 定义一个用于创建响应的函数，以减少代码重复
 def create_response(new_data=False):
-    """
-    根据数据创建响应内容。
 
-    参数:
-    new_data - 布尔值，指示是否有新数据。
-
-    返回:
-    包含响应数据的字典。
-    """
     response = {'new_data': new_data}
     if new_data:
         response.update({
@@ -32,8 +24,16 @@ def create_response(new_data=False):
         })
     return response
 
-@app.route('/', methods=['GET'])
-def hello():
+# 传文件
+def create_file_response():
+    response = {}
+    response.update({
+        'file_stream': data.get('file_stream'),
+    })
+    return response
+
+@app.route('/getEmail', methods=['GET'])
+def getEmail():
     """
     根据GET请求查询并返回数据，如果有新数据，立即返回；否则，等待一定时间。
     """
@@ -55,14 +55,29 @@ def hello():
     # 超时后，没有新数据响应
     return jsonify(create_response())
 
-@app.route('/postdata', methods=['POST'])
-def post_data():
+@app.route('/getFile', methods=['GET'])
+def getFile():
+    return jsonify(create_file_response())
+
+
+@app.route('/postEmail', methods=['POST'])
+def post_email():
     """
     接收POST请求，存储数据并返回。
     """
     global data
     data = request.get_json()
     return jsonify(create_response(new_data=True))
+
+
+@app.route('/postFile', methods=['POST'])
+def post_file():
+    """
+    接收POST请求，存储数据并返回。
+    """
+    global data
+    data = request.get_json()
+    return jsonify(create_file_response())
 
 # 主程序入口
 if __name__ == '__main__':
