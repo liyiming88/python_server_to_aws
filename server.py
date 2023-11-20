@@ -57,7 +57,10 @@ def getEmail():
 
 @app.route('/getFile', methods=['GET'])
 def getFile():
-    return jsonify(create_file_response())
+    response = []
+    file_stream = data.get('file_stream')
+    response.append(file_stream)
+    return response
 
 
 @app.route('/postEmail', methods=['POST'])
