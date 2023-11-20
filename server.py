@@ -55,12 +55,9 @@ def getEmail():
     # 超时后，没有新数据响应
     return jsonify(create_response())
 
-@app.route('/getFile', methods=['GET'])
-def getFile():
-    response = []
-    file_stream = data.get('file_stream')
-    response.append(file_stream)
-    return response
+@app.route('/postEmptyFile', methods=['POST'])
+def post_empty_file():
+    return jsonify(create_file_response())
 
 
 @app.route('/postEmail', methods=['POST'])
