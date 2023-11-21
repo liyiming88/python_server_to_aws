@@ -79,6 +79,20 @@ def post_file():
     data = request.get_json()
     return jsonify(create_file_response())
 
+@app.route('/postAll', methods=['POST'])
+def post_all():
+    # 确保请求中有JSON数据
+    if request.is_json:
+        # 获取请求中的JSON数据
+        req_data = request.get_json()
+        # 直接返回请求中的JSON数据
+        response = jsonify(req_data)
+        response.status_code = 200
+        return response
+    else:
+        # 若请求中没有JSON数据，则返回错误
+        return jsonify({"error": "Request must be JSON"}), 400
+
 # 主程序入口
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
