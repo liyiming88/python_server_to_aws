@@ -6,6 +6,10 @@ app = Flask(__name__)
 
 # 用于存储数据
 data = {}
+
+# 用于存储附件编码
+attachment = {}
+previous_attachment = {}
 # 存储上一次的数据，用于和新数据对比
 previous_data = {'id': 'previous_default'}
 
@@ -55,6 +59,23 @@ def getEmail():
     # 超时后，没有新数据响应
     return jsonify(create_response())
 
+@app.route('/getAttachment', methods=['GET'])
+def get_attachment():
+    """
+    长轮询，如果attachment值更新，则返回它的值，之后再进入到长轮询中。
+    """
+    global attachment
+    global previous_attachment
+    timeout = int(request.args.get('timeout', 30))  # 设置超时时间，默认为30秒
+    wait_time = 0
+    while wait_time < timeout:
+        if attachment != previous_attachment and attachment:
+            previous_attachment = attachment
+            return jsonify({'file_stream': attachment, 'new_data':True})
+        time.sleep(1)  # 休眠1秒，再次检查
+        wait_time += 1
+    return jsonify({'new_data':False})
+
 @app.route('/postEmptyFile', methods=['POST'])
 def post_empty_file():
     return jsonify(create_file_response())
@@ -69,16 +90,19 @@ def post_email():
     data = request.get_json()
     return jsonify(create_response(new_data=True))
 
-
+# 从Zapier中上传文件数据至服务端
 @app.route('/postFile', methods=['POST'])
 def post_file():
     """
-    接收POST请求，存储数据并返回。
+    接收POST请求，存储数据并返回上传成功。
     """
     global data
+    global attachment
     data = request.get_json()
-    return jsonify(create_file_response())
+    attachment = data.get('file_stream')  # 保存data中file_stream的值到服务器变量中
+    return attachment
 
+# 接收Zapier传来的所有body键值对
 @app.route('/postAll', methods=['POST'])
 def post_all():
     # 确保请求中有JSON数据
@@ -92,6 +116,8 @@ def post_all():
     else:
         # 若请求中没有JSON数据，则返回错误
         return jsonify({"error": "Request must be JSON"}), 400
+    
+
 
 # 主程序入口
 if __name__ == '__main__':
