@@ -100,7 +100,7 @@ def post_file():
     global attachment
     data = request.get_json()
     attachment = data.get('file_stream')  # 保存data中file_stream的值到服务器变量中
-    return attachment
+    return jsonify(data)
 
 # 接收Zapier传来的所有body键值对
 @app.route('/postAll', methods=['POST'])
