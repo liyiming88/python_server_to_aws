@@ -41,4 +41,4 @@ def generate_image():
     return jsonify(response.json()), response.status_code
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3333)
+    app.run(host='0.0.0.0', port=28256)
