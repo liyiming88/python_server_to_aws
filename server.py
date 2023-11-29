@@ -41,8 +41,19 @@ def create_file_response():
 def health_check():
     return jsonify({"status": "OK"})
 
+# 查找一次是否有新邮件
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
+    # 如果有新数据，立即返回
+    if 'id' in data and data['id'] and previous_data['id'] != data['id']:
+        previous_data['id'] = data['id']
+        return jsonify(create_response(new_data=True))
+    else:
+        return jsonify({'new_data':False})
+
+# 轮询是否有新邮件
+@app.route('/getEmailPolling', methods=['GET'])
+def getEmailPolling():
     """
     根据GET请求查询并返回数据，如果有新数据，立即返回；否则，等待一定时间。
     """
