@@ -36,6 +36,10 @@ def create_file_response():
     })
     return response
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "OK"
+
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
     """
