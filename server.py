@@ -36,9 +36,10 @@ def create_file_response():
     })
     return response
 
+# 测试接口健康状态
 @app.route('/health', methods=['GET'])
 def health_check():
-    return "OK"
+    return jsonify({"status": "OK"})
 
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
