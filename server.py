@@ -57,13 +57,13 @@ def health_check():
 @app.route('/getEvent', methods=['GET'])
 def getEvent():
     timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
-    if data['event_found'] is not None:
+    if 'event_found' in data and data['event_found'] is not None:
         return jsonify(create_event_response())
     else:
         # 如果没有新数据，等待直到超时
         wait_time = 0
         while wait_time < timeout:
-            if data['event_found'] is not None:
+            if 'event_found' in data and data['event_found'] is not None:
                 return jsonify(create_event_response())
             time.sleep(1)  # 休眠1秒，再次检查
             wait_time += 1
