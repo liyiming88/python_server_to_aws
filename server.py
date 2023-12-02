@@ -53,6 +53,11 @@ def create_file_response():
 def health_check():
     return jsonify({"status": "OK"})
 
+# 查找一次是否有新event
+@app.route('/getEvent', methods=['GET'])
+def getEvent():
+    return jsonify(create_event_response())
+
 # 查找一次是否有新邮件
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
