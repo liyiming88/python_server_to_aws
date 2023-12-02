@@ -28,6 +28,18 @@ def create_response(new_data=False):
         })
     return response
 
+def create_event_response():
+
+    response = {}
+    response.update({
+        'summary': data.get('summary'),
+        'start_time': data.get('start_time'),
+        'end_time': data.get('end_time'),
+        'attendee_emails': data.get('attendee_emails'),
+        'event_found': data.get('event_found')
+    })
+    return response
+
 # 传文件
 def create_file_response():
     response = {}
@@ -98,13 +110,22 @@ def post_empty_file():
 
 
 @app.route('/postEmail', methods=['POST'])
-def post_email():
+def post_event():
     """
     接收POST请求，存储数据并返回。
     """
     global data
     data = request.get_json()
     return jsonify(create_response(new_data=True))
+
+@app.route('/postEvent', methods=['POST'])
+def post_email():
+    """
+    接收POST请求，存储数据并返回。
+    """
+    global data
+    data = request.get_json()
+    return jsonify(create_event_response())
 
 # 从Zapier中上传文件数据至服务端
 @app.route('/postFile', methods=['POST'])
