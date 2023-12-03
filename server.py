@@ -14,18 +14,17 @@ previous_attachment = {}
 previous_data = {'id': 'previous_default'}
 
 # 定义一个用于创建响应的函数，以减少代码重复
-def create_response(new_data=False):
+def create_email_response():
 
-    response = {'new_data': new_data}
-    if new_data:
-        response.update({
-            'sender': data.get('sender'),
-            'subject': data.get('subject'),
-            'content': data.get('content'),
-            'id': data.get('id'),
-            'sender_email_address': data.get('sender_email_address'),
-            'thread_id': data.get('thread_id'),
-        })
+    response = {}
+    response.update({
+        'sender': data.get('sender'),
+        'subject': data.get('subject'),
+        'content': data.get('content'),
+        'sender_email_address': data.get('sender_email_address'),
+        'thread_id': data.get('thread_id'),
+        'email_found': data.get('email_found')
+    })
     return response
 
 def create_event_response():
@@ -74,12 +73,20 @@ def getEvent():
 # 查找一次是否有新邮件
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
-    # 如果有新数据，立即返回
-    if 'id' in data and data['id'] and previous_data['id'] != data['id']:
-        previous_data['id'] = data['id']
-        return jsonify(create_response(new_data=True))
+    timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
+    if 'email_found' in data and data['email_found'] is not None:
+        return jsonify(create_email_response())
     else:
-        return jsonify({'new_data':False})
+        # 如果没有新数据，等待直到超时
+        wait_time = 0
+        while wait_time < timeout:
+            if 'email_found' in data and data['email_found'] is not None:
+                return jsonify(create_email_response())
+            time.sleep(1)  # 休眠1秒，再次检查
+            wait_time += 1
+
+    # 超时后，没有新数据响应
+    return jsonify({'event_found':False})
 
 # 轮询是否有新邮件
 @app.route('/getEmailPolling', methods=['GET'])
@@ -91,19 +98,19 @@ def getEmailPolling():
     # 如果有新数据，立即返回
     if 'id' in data and data['id'] and previous_data['id'] != data['id']:
         previous_data['id'] = data['id']
-        return jsonify(create_response(new_data=True))
+        return jsonify(create_email_response())
 
     # 如果没有新数据，等待直到超时
     wait_time = 0
     while wait_time < timeout:
         if 'id' in data and data['id'] and previous_data['id'] != data['id']:
             previous_data['id'] = data['id']
-            return jsonify(create_response(new_data=True))
+            return jsonify(create_email_response(new_data=True))
         time.sleep(1)  # 休眠1秒，再次检查
         wait_time += 1
 
     # 超时后，没有新数据响应
-    return jsonify(create_response())
+    return jsonify(create_email_response())
 
 @app.route('/getAttachment', methods=['GET'])
 def get_attachment():
