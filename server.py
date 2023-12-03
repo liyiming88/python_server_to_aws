@@ -86,7 +86,7 @@ def getEmail():
             wait_time += 1
 
     # 超时后，没有新数据响应
-    return jsonify({'event_found':False})
+    return jsonify({'email_found':False})
 
 # 轮询是否有新邮件
 @app.route('/getEmailPolling', methods=['GET'])
