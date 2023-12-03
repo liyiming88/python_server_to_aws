@@ -141,7 +141,7 @@ def post_event():
     """
     global data
     data = request.get_json()
-    return jsonify(create_response(new_data=True))
+    return jsonify(create_email_response())
 
 @app.route('/postEvent', methods=['POST'])
 def post_email():
