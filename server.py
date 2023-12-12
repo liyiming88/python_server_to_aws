@@ -112,22 +112,27 @@ def getEmailPolling():
     # 超时后，没有新数据响应
     return jsonify(create_email_response())
 
+# @app.route('/getAttachment', methods=['GET'])
+# def get_attachment():
+#     """
+#     长轮询，如果attachment值更新，则返回它的值，之后再进入到长轮询中。
+#     """
+#     global attachment
+#     global previous_attachment
+#     timeout = int(request.args.get('timeout', 30))  # 设置超时时间，默认为30秒
+#     wait_time = 0
+#     while wait_time < timeout:
+#         if attachment != previous_attachment and attachment:
+#             previous_attachment = attachment
+#             return jsonify({'file_stream': attachment, 'new_data':True})
+#         time.sleep(1)  # 休眠1秒，再次检查
+#         wait_time += 1
+#     return jsonify({'new_data':False})
+
 @app.route('/getAttachment', methods=['GET'])
 def get_attachment():
-    """
-    长轮询，如果attachment值更新，则返回它的值，之后再进入到长轮询中。
-    """
     global attachment
-    global previous_attachment
-    timeout = int(request.args.get('timeout', 30))  # 设置超时时间，默认为30秒
-    wait_time = 0
-    while wait_time < timeout:
-        if attachment != previous_attachment and attachment:
-            previous_attachment = attachment
-            return jsonify({'file_stream': attachment, 'new_data':True})
-        time.sleep(1)  # 休眠1秒，再次检查
-        wait_time += 1
-    return jsonify({'new_data':False})
+    return jsonify({'file_stream':attachment})
 
 @app.route('/postEmptyFile', methods=['POST'])
 def post_empty_file():
