@@ -55,20 +55,7 @@ def health_check():
 # 查找一次是否有新event
 @app.route('/getEvent', methods=['GET'])
 def getEvent():
-    timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
-    if 'event_found' in data and data['event_found'] is not None:
-        return jsonify(create_event_response())
-    else:
-        # 如果没有新数据，等待直到超时
-        wait_time = 0
-        while wait_time < timeout:
-            if 'event_found' in data and data['event_found'] is not None:
-                return jsonify(create_event_response())
-            time.sleep(1)  # 休眠1秒，再次检查
-            wait_time += 1
-
-    # 超时后，没有新数据响应
-    return jsonify({'event_found':False})
+    return data
 
 # 查找一次是否有新邮件
 @app.route('/getEmail', methods=['GET'])
@@ -140,7 +127,7 @@ def post_empty_file():
 
 
 @app.route('/postEmail', methods=['POST'])
-def post_event():
+def post_email():
     """
     接收POST请求，存储数据并返回。
     """
@@ -149,13 +136,10 @@ def post_event():
     return jsonify(create_email_response())
 
 @app.route('/postEvent', methods=['POST'])
-def post_email():
-    """
-    接收POST请求，存储数据并返回。
-    """
+def post_event():
     global data
     data = request.get_json()
-    return jsonify(create_event_response())
+    return data
 
 # 从Zapier中上传文件数据至服务端
 @app.route('/postFile', methods=['POST'])
@@ -172,6 +156,7 @@ def post_file():
 # 接收Zapier传来的所有body键值对
 @app.route('/postAll', methods=['POST'])
 def post_all():
+    global data
     # 确保请求中有JSON数据
     if request.is_json:
         # 获取请求中的JSON数据
@@ -179,6 +164,7 @@ def post_all():
         # 直接返回请求中的JSON数据
         response = jsonify(req_data)
         response.status_code = 200
+        data = response
         return response
     else:
         # 若请求中没有JSON数据，则返回错误
