@@ -56,7 +56,7 @@ def health_check():
 # 查找一次是否有新event
 @app.route('/getEvent', methods=['GET'])
 def getEvent():
-    content = json.loads(data.data)["content"]
+    content = data.data
     return content
 
 # 查找一次是否有新邮件
