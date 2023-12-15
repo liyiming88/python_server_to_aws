@@ -8,7 +8,6 @@ app = Flask(__name__)
 # 用于存储数据
 data = {}
 event_data = {}
-email_date = {}
 
 # 用于存储附件编码
 attachment = {}
@@ -27,18 +26,6 @@ def create_email_response():
         'sender_email_address': data.get('sender_email_address'),
         'thread_id': data.get('thread_id'),
         'email_found': data.get('email_found')
-    })
-    return response
-
-def create_event_response():
-
-    response = {}
-    response.update({
-        'summary': data.get('summary'),
-        'start_time': data.get('start_time'),
-        'end_time': data.get('end_time'),
-        'attendee_emails': data.get('attendee_emails'),
-        'event_found': data.get('event_found')
     })
     return response
 
