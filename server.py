@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import time
+import json
 
 # 初始化Flask应用
 app = Flask(__name__)
@@ -55,7 +56,8 @@ def health_check():
 # 查找一次是否有新event
 @app.route('/getEvent', methods=['GET'])
 def getEvent():
-    return data
+    content = json.loads(data.data)["content"]
+    return content
 
 # 查找一次是否有新邮件
 @app.route('/getEmail', methods=['GET'])
