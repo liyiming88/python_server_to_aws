@@ -9,6 +9,7 @@ app = Flask(__name__)
 data = {}
 event_data = {}
 email_data = {}
+isEmailPosted = False
 
 # 用于存储附件编码
 attachment = {}
@@ -18,7 +19,7 @@ previous_data = {'id': 'previous_default'}
 
 # 定义一个用于创建响应的函数，以减少代码重复
 def create_email_response():
-
+    global isEmailPosted
     response = {}
     response.update({
         'sender': email_data.get('sender'),
@@ -28,6 +29,7 @@ def create_email_response():
         'thread_id': email_data.get('thread_id'),
         'email_found': email_data.get('email_found')
     })
+    isEmailPosted = True
     return response
 
 # 传文件
@@ -64,17 +66,19 @@ def getEvent():
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
     timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
-    if 'email_found' in email_data and email_data['email_found'] is not None:
+    if 'email_found' in email_data and email_data['email_found'] is not None and isEmailPosted:
+        isEmailPosted = False
         return jsonify(create_email_response())
     else:
         # 如果没有新数据，等待直到超时
         wait_time = 0
         while wait_time < timeout:
             if 'email_found' in email_data and email_data['email_found'] is not None:
+                isEmailPosted = False
                 return jsonify(create_email_response())
             time.sleep(1)  # 休眠1秒，再次检查
             wait_time += 1
-
+    isEmailPosted = False
     # 超时后，没有新数据响应
     return jsonify({'email_found':False})
 
@@ -135,7 +139,6 @@ def post_email():
     接收POST请求，存储数据并返回。
     """
     global email_data
-    email_data = {}
     email_data = request.get_json()
     return jsonify(create_email_response())
 
