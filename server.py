@@ -8,6 +8,7 @@ app = Flask(__name__)
 # 用于存储数据
 data = {}
 event_data = {}
+email_data = {}
 
 # 用于存储附件编码
 attachment = {}
@@ -20,12 +21,12 @@ def create_email_response():
 
     response = {}
     response.update({
-        'sender': data.get('sender'),
-        'subject': data.get('subject'),
-        'content': data.get('content'),
-        'sender_email_address': data.get('sender_email_address'),
-        'thread_id': data.get('thread_id'),
-        'email_found': data.get('email_found')
+        'sender': email_data.get('sender'),
+        'subject': email_data.get('subject'),
+        'content': email_data.get('content'),
+        'sender_email_address': email_data.get('sender_email_address'),
+        'thread_id': email_data.get('thread_id'),
+        'email_found': email_data.get('email_found')
     })
     return response
 
@@ -63,13 +64,13 @@ def getEvent():
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
     timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
-    if 'email_found' in data and data['email_found'] is not None:
+    if 'email_found' in email_data and email_data['email_found'] is not None:
         return jsonify(create_email_response())
     else:
         # 如果没有新数据，等待直到超时
         wait_time = 0
         while wait_time < timeout:
-            if 'email_found' in data and data['email_found'] is not None:
+            if 'email_found' in email_data and email_data['email_found'] is not None:
                 return jsonify(create_email_response())
             time.sleep(1)  # 休眠1秒，再次检查
             wait_time += 1
@@ -133,13 +134,15 @@ def post_email():
     """
     接收POST请求，存储数据并返回。
     """
-    global data
-    data = request.get_json()
+    global email_data
+    email_data = {}
+    email_data = request.get_json()
     return jsonify(create_email_response())
 
 @app.route('/postEvent', methods=['POST'])
 def post_event():
     global event_data
+    event_data = {}
     event_data = request.get_json()
     return event_data
 
