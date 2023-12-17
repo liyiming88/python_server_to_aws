@@ -18,7 +18,7 @@ previous_attachment = {}
 previous_data = {'id': 'previous_default'}
 
 # 定义一个用于创建响应的函数，以减少代码重复
-def create_email_response():
+def create_email_response(postMethod = False):
     global isEmailPosted
     response = {}
     response.update({
@@ -29,7 +29,8 @@ def create_email_response():
         'thread_id': email_data.get('thread_id'),
         'email_found': email_data.get('email_found')
     })
-    isEmailPosted = True
+    if postMethod:
+        isEmailPosted = True
     return response
 
 # 传文件
@@ -65,15 +66,16 @@ def getEvent():
 # 查找一次是否有新邮件
 @app.route('/getEmail', methods=['GET'])
 def getEmail():
+    global isEmailPosted
     timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
-    if 'email_found' in email_data and email_data['email_found'] is not None and isEmailPosted:
+    if email_data is not None and isEmailPosted:
         isEmailPosted = False
         return jsonify(create_email_response())
     else:
         # 如果没有新数据，等待直到超时
         wait_time = 0
         while wait_time < timeout:
-            if 'email_found' in email_data and email_data['email_found'] is not None:
+            if email_data is not None and isEmailPosted:
                 isEmailPosted = False
                 return jsonify(create_email_response())
             time.sleep(1)  # 休眠1秒，再次检查
@@ -140,7 +142,7 @@ def post_email():
     """
     global email_data
     email_data = request.get_json()
-    return jsonify(create_email_response())
+    return jsonify(create_email_response(True))
 
 @app.route('/postEvent', methods=['POST'])
 def post_event():
