@@ -10,6 +10,7 @@ data = {}
 event_data = {}
 email_data = {}
 isEmailPosted = False
+isEventPosted = False
 
 # 用于存储附件编码
 attachment = {}
@@ -33,6 +34,13 @@ def create_email_response(postMethod = False):
         isEmailPosted = True
     return response
 
+def create_event_response(postMethod = False):
+    global isEventPosted
+    global event_data
+    if postMethod:
+        isEventPosted = True
+    return event_data
+
 # 传文件
 def create_file_response():
     response = {}
@@ -49,17 +57,21 @@ def health_check():
 # 查找一次是否有新event
 @app.route('/getEvent', methods=['GET'])
 def getEvent():
+    global isEventPosted
     timeout = int(request.args.get('timeout', 10))  # 设置超时时间，默认为30秒
-    if event_data is not None:
-        return event_data
+    if event_data is not None and isEventPosted:
+        isEventPosted = False
+        return create_event_response()
     else:
+        # 如果没有新数据，等待直到超时
         wait_time = 0
         while wait_time < timeout:
-            if event_data is not None:
-                return event_data
-            time.sleep(1)  # 休眠1秒，再次检查
+            if event_data is not None and isEventPosted:
+                isEventPosted = False
+                return create_event_response()
+            time.sleep(1)  # 休眠1秒，再次检
             wait_time += 1
-
+    isEventPosted = False
     # 超时后，没有新数据响应
     return jsonify({'event_found':False})
 
@@ -147,9 +159,8 @@ def post_email():
 @app.route('/postEvent', methods=['POST'])
 def post_event():
     global event_data
-    event_data = {}
     event_data = request.get_json()
-    return event_data
+    return create_event_response(True)
 
 # 从Zapier中上传文件数据至服务端
 @app.route('/postFile', methods=['POST'])
